@@ -73,13 +73,38 @@ async def get_embedding(text: str, url: str) -> List[float]:
         return embedding
 
 
+# Write your own post chunk processor to match your needs
+def postprocess_chunks(all_chunks):
+    """
+    Remove chunks when "chunk": ""
+    Remove chunks when "page_title" starts with "Access denied"
+    """
+    processed_chunks = []
+
+    for index, chunk in enumerate(all_chunks):
+        if (chunk["chunk"] == ""):
+            print("Chunk has no text")
+            print(f"Removing chunk {index}")
+            continue
+        elif (chunk["page_title"].startswith("Access denied")):
+            print("Access denied page")
+            print(f"Removing chunk {index}")
+            continue
+        else:
+            processed_chunks.append(chunk)
+
+    return processed_chunks
+
+
 async def embedder_main():
     all_chunks = load_json(settings.input_path / CHUNKED_SAVE_FILE)
 
+    postprocessed_chunks = postprocess_chunks(all_chunks)
+
     all_chunk_embeddings = []
 
-    for index, chunk in enumerate(all_chunks):
-        print(f"Processing {index}/{len(all_chunks)}")
+    for index, chunk in enumerate(postprocessed_chunks):
+        print(f"Processing {index}/{len(postprocessed_chunks)}")
 
         try:
             embedding = await get_embedding(chunk["chunk"], chunk["page_url"])
