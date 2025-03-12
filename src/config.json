@@ -1,0 +1,8 @@
+{
+    "embedding_config": {
+        "embedding_model": "models/gemini-embedding-exp-03-07",
+        "vector_size": 3072,
+        "collection_name": "flare_collection"
+    },
+    "generated_output_file": "generated_data.csv"
+}
